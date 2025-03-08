@@ -1,14 +1,14 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "b400207d5fa8454dc2f1bb103b9c0528"
-application_url = "https://commentary-besides-mounted-seems.trycloudflare.com"
+client_id = "d37701c35c34b1fd2fb51ae4756686eb"
+application_url = "https://concord-dining-journalist-eyed.trycloudflare.com"
 embedded = true
 name = "app-02"
 handle = "app-1601"
 
 [build]
-include_config_on_deploy = true
 automatically_update_urls_on_dev = true
+include_config_on_deploy = true
 
 [webhooks]
 api_version = "2025-01"
@@ -19,9 +19,9 @@ scopes = "read_customers,read_draft_orders,read_orders,read_products,write_draft
 
 [auth]
 redirect_urls = [
-  "https://commentary-besides-mounted-seems.trycloudflare.com/auth/callback",
-  "https://commentary-besides-mounted-seems.trycloudflare.com/auth/shopify/callback",
-  "https://commentary-besides-mounted-seems.trycloudflare.com/api/auth/callback"
+  "https://concord-dining-journalist-eyed.trycloudflare.com/auth/callback",
+  "https://concord-dining-journalist-eyed.trycloudflare.com/auth/shopify/callback",
+  "https://concord-dining-journalist-eyed.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

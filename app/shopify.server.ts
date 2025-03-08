@@ -17,20 +17,28 @@ const shopify = shopifyApp({
   authPathPrefix: "/auth",
   sessionStorage: new PrismaSessionStorage(prisma),
   distribution: AppDistribution.AppStore,
-  // webhooks: {
-  //   APP_UNINSTALLED: {
-  //     deliveryMethod: DeliveryMethod.Http,
-  //     callbackUrl: "/webhooks",
-  //   },
-  //   PRODUCTS_UPDATE: {
-  //     deliveryMethod: DeliveryMethod.Http,
-  //     callbackUrl: "/webhooks",
-  //   },
-  //   ORDERS_CREATE: {
-  //     deliveryMethod: DeliveryMethod.Http,
-  //     callbackUrl: "/webhooks",
-  //   },
-  // },
+  webhooks: {
+    APP_UNINSTALLED: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+    },
+    // PRODUCTS_UPDATE: {
+    //   deliveryMethod: DeliveryMethod.Http,
+    //   callbackUrl: "/webhooks",
+    // },
+    ORDERS_CREATE: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+    },
+    ORDERS_UPDATED: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+    },
+    ORDERS_CANCELLED: {
+      deliveryMethod: DeliveryMethod.Http,
+      callbackUrl: "/webhooks",
+    },
+  },
   hooks: {
     afterAuth: async ({ session }) => {
       shopify.registerWebhooks({ session });
