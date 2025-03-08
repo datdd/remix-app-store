@@ -1,31 +1,28 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "09b2cad67d7a2fbb174a9ec388912c90"
-application_url = "https://example.com/"
+client_id = "b400207d5fa8454dc2f1bb103b9c0528"
+application_url = "https://commentary-besides-mounted-seems.trycloudflare.com"
 embedded = true
-name = "remix-app-store"
-handle = "remix-app-store-1"
+name = "app-02"
+handle = "app-1601"
 
 [build]
 include_config_on_deploy = true
+automatically_update_urls_on_dev = true
 
 [webhooks]
 api_version = "2025-01"
 
-  [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/app/uninstalled"
-
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/app/scopes_update"
-
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+scopes = "read_customers,read_draft_orders,read_orders,read_products,write_draft_orders,write_orders,write_products"
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://commentary-besides-mounted-seems.trycloudflare.com/auth/callback",
+  "https://commentary-besides-mounted-seems.trycloudflare.com/auth/shopify/callback",
+  "https://commentary-besides-mounted-seems.trycloudflare.com/api/auth/callback"
+]
 
 [pos]
 embedded = false
