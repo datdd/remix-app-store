@@ -1,9 +1,9 @@
 @startuml
 actor Merchant
 participant "Browser" as Browser
-participant "Remix Server\n(app/routes/app.orders.$id.tsx)" as Server
+participant "Remix Server" as Server
 participant "Shopify API" as ShopifyAPI
-participant "Order Model\n(order.server.ts)" as OrderModel
+participant "Order Model" as OrderModel
 participant "Prisma DB" as Prisma
 participant "Logger" as Logger
 

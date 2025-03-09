@@ -10,7 +10,7 @@ Shopify -> Server: POST /webhooks/orders/create\n(order payload: id, name, tags,
 activate Server
 note right: Webhook triggered by order creation/update
 
-Server -> Server: Validate webhook (HMAC, headers)
+Server -> Server: Validate webhook (Authenticate)
 alt Validation successful
     Server -> OrderModel: upsertOrder(orderData)
     activate OrderModel
