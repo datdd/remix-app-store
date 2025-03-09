@@ -43,16 +43,10 @@ shopify app deploy
 4. **Setup Prisma**:
 
 ```shell
-shopify app deploy
-```
-
-5. **Register Shopify Webhooks**:
-
-```shell
 npx prisma migrate dev --name init
 ```
 
-6. **Run the Application**:
+5. **Run the Application**:
 
 ```shell
 shopify app dev
@@ -102,22 +96,6 @@ model Order {
 #### Remove Tags from Order
 
 ![Remove Tags from Order](./docs/images/remove_tag_to_order.png)
-
-
-## Benefits
-
-Shopify apps are built on a variety of Shopify tools to create a great merchant experience.
-
-<!-- TODO: Uncomment this after we've updated the docs -->
-<!-- The [create an app](https://shopify.dev/docs/apps/getting-started/create) tutorial in our developer documentation will guide you through creating a Shopify app using this template. -->
-
-The Remix app template comes with the following out-of-the-box functionality:
-
-- [OAuth](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-admin-requests): Installing the app and granting permissions
-- [GraphQL Admin API](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#using-the-shopify-admin-graphql-api): Querying or mutating Shopify admin data
-- [Webhooks](https://github.com/Shopify/shopify-app-js/tree/main/packages/shopify-app-remix#authenticating-webhook-requests): Callbacks sent by Shopify when certain events occur
-- [AppBridge](https://shopify.dev/docs/api/app-bridge): This template uses the next generation of the Shopify App Bridge library which works in unison with previous versions.
-- [Polaris](https://polaris.shopify.com/): Design system that enables apps to create Shopify-like experiences
 
 ## Tech Stack
 

@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
-client_id = "bbed82e4b8d28f96a4f5de0e316c0066"
-application_url = "https://flashing-january-usage-customized.trycloudflare.com"
+client_id = ""
+application_url = ""
 embedded = true
 name = "remix-app-store"
 handle = "remix-app-store-2"
@@ -18,11 +18,7 @@ api_version = "2025-01"
 scopes = "read_customers,read_draft_orders,read_orders,read_products,write_draft_orders,write_orders,write_products"
 
 [auth]
-redirect_urls = [
-  "https://flashing-january-usage-customized.trycloudflare.com/auth/callback",
-  "https://flashing-january-usage-customized.trycloudflare.com/auth/shopify/callback",
-  "https://flashing-january-usage-customized.trycloudflare.com/api/auth/callback"
-]
+redirect_urls = []
 
 [pos]
 embedded = false
