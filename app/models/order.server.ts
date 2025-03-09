@@ -39,16 +39,19 @@ export async function getOrders() {
   }
 }
 
-export async function updateTags(orderId: number, tags: string | null) {
+export async function updateOrderTags(orderId: string, currentTags: string[], adds: string[], removes: string[]) {
   try {
-    const result = await prisma.order.update({
-      where: { id: orderId },
-      data: { tags },
+    const updatedTags = [
+      ...currentTags.filter((tag) => !removes.includes(tag)),
+      ...adds,
+    ].filter((tag, index, self) => tag && self.indexOf(tag) === index);
+
+    return prisma.order.update({
+      where: { orderId: orderId },
+      data: { tags: updatedTags.length ? updatedTags.join(",") : null },
     });
-    log.info("Tags updated successfully", { orderId });
-    return result;
   } catch (error) {
-    log.error("Failed to update tags", { error: error.message, orderId });
-    throw new Error("Failed to update tags");
+    log.error("Failed to update order tags", { error: error.message, orderId });
+    throw error;
   }
 }

@@ -1,0 +1,78 @@
+@startuml
+actor Merchant
+participant "Browser" as Browser
+participant "Remix Server" as Server
+participant "Order Model" as OrderModel
+participant "Prisma DB" as Prisma
+participant "Logger" as Logger
+
+== Display Order List ==
+Merchant -> Browser: Access order list page (e.g., /)
+activate Browser
+note right: Merchant wants to view all orders
+
+Browser -> Server: GET /
+activate Server
+note right: Request to load order list page
+
+Server -> OrderModel: getOrders()
+activate OrderModel
+note right: Fetch all orders from database
+
+OrderModel -> Prisma: prisma.order.findMany()
+activate Prisma
+alt Database query succeeds
+    Prisma -> Prisma: Retrieve all orders
+    Prisma --> OrderModel: orders[] (list of orders)
+    deactivate Prisma
+
+    OrderModel -> Logger: Log "Orders retrieved successfully"
+    activate Logger
+    Logger --> OrderModel: Success
+    deactivate Logger
+
+    OrderModel --> Server: orders[]
+    deactivate OrderModel
+
+    Server -> Server: Render HTML with orders data
+    Server --> Browser: 200 OK (HTML + JSON with orders)
+    deactivate Server
+
+    Browser -> Merchant: Display order list UI
+else Database query fails
+    Prisma --> OrderModel: Error (e.g., database unavailable)
+    deactivate Prisma
+
+    OrderModel -> Logger: Log "Failed to retrieve orders" {error}
+    activate Logger
+    Logger --> OrderModel: Success
+    deactivate Logger
+
+    OrderModel --> Server: Error
+    deactivate OrderModel
+
+    Server --> Browser: 500 Internal Server Error { error: "Failed to load orders" }
+    deactivate Server
+
+    Browser -> Merchant: Display error message
+end
+deactivate Browser
+note right: Merchant sees order list or error
+
+== Export Orders to CSV (Client-side) ==
+Merchant -> Browser: Click "Export Orders to CSV"
+activate Browser
+note right: Trigger exportCSV function in UI
+
+Browser -> Browser: Call exportCSV(orders)
+alt Orders exist
+    Browser -> Browser: generateCSVContent(orders)
+    note right: Convert orders to CSV string
+    Browser -> Merchant: Download orders.csv file
+else No orders
+    Browser -> Merchant: Alert "No orders to export"
+end
+deactivate Browser
+note right: Merchant receives CSV file or alert
+
+@enduml

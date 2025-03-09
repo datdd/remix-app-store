@@ -1,0 +1,46 @@
+@startuml
+actor Merchant
+participant "Browser" as Browser
+participant "Remix App\n(app/routes/index.tsx)" as App
+participant "Remix Server\n(app/routes/index.tsx)" as Server
+participant "Order Model\n(order.server.ts)" as OrderModel
+participant "Prisma DB" as Prisma
+participant "Logger" as Logger
+
+
+== Export Orders to CSV (Client-side) ==
+Merchant -> Browser: Click "Export Orders to CSV"
+activate Browser
+note right: Trigger exportCSV function
+
+Browser -> App: Call exportCSV(orders)
+activate App
+alt Orders exist
+    App -> App: generateCSVContent(orders)
+    note right: Convert orders to CSV string
+    App -> Browser: new Blob([csvContent], {type: "text/csv"})
+    activate Browser
+    Browser -> Browser: URL.createObjectURL(blob)
+    Browser --> App: blob URL
+    deactivate Browser
+
+    App -> Browser: Create <a> element
+    activate Browser
+    Browser -> Browser: Set href=blobURL, download="orders.csv"
+    Browser -> Browser: Append to DOM, click(), remove from DOM
+    Browser -> Merchant: Download orders.csv file
+    deactivate Browser
+
+    App --> Browser: Complete export
+    deactivate App
+    Browser -> Merchant: Show success (optional UI update)
+else No orders
+    App --> Browser: Alert "No orders to export"
+    deactivate App
+    Browser -> Merchant: Display alert
+end
+deactivate Browser
+
+note right: Merchant receives CSV file or alert
+
+@enduml

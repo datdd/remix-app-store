@@ -1,0 +1,54 @@
+@startuml
+actor Shopify
+participant "Remix Server" as Server
+participant "Order Model" as OrderModel
+participant "Prisma DB" as Prisma
+participant "Logger" as Logger
+
+== Order Creation/Update via Webhook ==
+Shopify -> Server: POST /webhooks/orders/create\n(order payload: id, name, tags, totalPrice, etc.)
+activate Server
+note right: Webhook triggered by order creation/update
+
+Server -> Server: Validate webhook (HMAC, headers)
+alt Validation successful
+    Server -> OrderModel: upsertOrder(orderData)
+    activate OrderModel
+    note right: orderData includes\norderId, orderNumber, tags, totalPrice, etc.
+
+    OrderModel -> Prisma: prisma.order.upsert(where: orderId, update: orderData, create: orderData)
+    activate Prisma
+    alt Order exists
+        Prisma -> Prisma: Update order with orderData
+    else Order does not exist
+        Prisma -> Prisma: Create new order with orderData
+    end
+    alt Prisma operation succeeds
+        Prisma --> OrderModel: Updated/Created order
+        deactivate Prisma
+        OrderModel -> Logger: Log "Order upserted successfully" {orderId}
+        activate Logger
+        Logger --> OrderModel: Success
+        deactivate Logger
+        OrderModel --> Server: Updated/Created order
+        deactivate OrderModel
+        Server --> Shopify: 200 OK { success: true }
+    else Prisma operation fails
+        Prisma --> OrderModel: Error (e.g., database unavailable)
+        deactivate Prisma
+        OrderModel -> Logger: Log "Failed to upsert order" {error, orderId}
+        activate Logger
+        Logger --> OrderModel: Success
+        deactivate Logger
+        OrderModel --> Server: Error
+        deactivate OrderModel
+        Server --> Shopify: 500 Internal Server Error { success: false, error: "Database error" }
+    end
+else Validation failed
+    Server --> Shopify: 400 Bad Request { success: false, error: "Invalid webhook" }
+end
+
+deactivate Server
+note right: Shopify receives confirmation or error
+
+@enduml

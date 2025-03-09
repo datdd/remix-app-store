@@ -1,0 +1,94 @@
+@startuml
+actor Merchant
+participant "Browser" as Browser
+participant "Remix Server\n(app/routes/app.orders.$id.tsx)" as Server
+participant "Shopify API" as ShopifyAPI
+participant "Order Model\n(order.server.ts)" as OrderModel
+participant "Prisma DB" as Prisma
+participant "Logger" as Logger
+
+== Add Tag to Order ==
+Merchant -> Browser: Add tag and click "Save Tags"
+activate Browser
+note right: Merchant submits form to add tags
+
+Browser -> Server: POST /app/orders/$id\n(form: currentTags, adds, removes=[])
+activate Server
+note right: Form data from UI
+
+Server -> Server: Authenticate request (Shopify session)
+alt Authentication successful
+    Server -> ShopifyAPI: tagsAdd(orderId, adds)
+    activate ShopifyAPI
+    note right: Mutation to add tags to order
+
+    alt Shopify mutation succeeds
+        ShopifyAPI --> Server: Success (no userErrors)
+        deactivate ShopifyAPI
+
+        Server -> OrderModel: updateOrderTags(orderId, currentTags, adds, [])
+        activate OrderModel
+
+        OrderModel -> Prisma: prisma.order.upsert(where: orderId, update: {tags}, create: orderData)
+        activate Prisma
+        alt Order exists
+            Prisma -> Prisma: Update order with new tags
+        else Order does not exist
+            Prisma -> Prisma: Create new order with tags and defaults
+        end
+        alt Prisma operation succeeds
+            Prisma --> OrderModel: Updated/Created order
+            deactivate Prisma
+
+            OrderModel -> Logger: Log "Order upserted successfully" {orderId}
+            activate Logger
+            Logger --> OrderModel: Success
+            deactivate Logger
+
+            OrderModel --> Server: Success
+            deactivate OrderModel
+
+            Server --> Browser: 200 OK { success: true, adds }
+            deactivate Server
+
+            Browser -> Merchant: Display success banner with added tags
+            deactivate Browser
+        else Prisma operation fails
+            Prisma --> OrderModel: Error (e.g., database unavailable)
+            deactivate Prisma
+
+            OrderModel -> Logger: Log "Failed to update order tags" {error, orderId}
+            activate Logger
+            Logger --> OrderModel: Success
+            deactivate Logger
+
+            OrderModel --> Server: Error
+            deactivate OrderModel
+
+            Server --> Browser: 200 OK { success: false, error: "Database sync failed" }
+            deactivate Server
+
+            Browser -> Merchant: Display error banner
+            deactivate Browser
+        end
+    else Shopify mutation fails
+        ShopifyAPI --> Server: Errors (userErrors)
+        deactivate ShopifyAPI
+
+        Server --> Browser: 200 OK { errors: userErrors, adds }
+        deactivate Server
+
+        Browser -> Merchant: Display error banner (Shopify errors)
+        deactivate Browser
+    end
+else Authentication failed
+    Server --> Browser: 401 Unauthorized { error: "Invalid session" }
+    deactivate Server
+
+    Browser -> Merchant: Redirect to login or show error
+    deactivate Browser
+end
+
+note right: Merchant sees updated tags or error
+
+@enduml

@@ -1,0 +1,58 @@
+@startuml
+actor Merchant
+participant "Browser" as Browser
+participant "Remix Server\n(app/routes/app.orders.$id.tsx)" as Server
+participant "Shopify API" as ShopifyAPI
+participant "Logger" as Logger
+
+== Display Order Details ==
+Merchant -> Browser: Access order details page (e.g., /app/orders/$id)
+activate Browser
+note right: Merchant views details of a specific order
+
+Browser -> Server: GET /app/orders/$id
+activate Server
+note right: Request to load order details
+
+Server -> Server: Authenticate request (Shopify session)
+alt Authentication successful
+    Server -> ShopifyAPI: GraphQL query (GetOrder, id: $id)
+    activate ShopifyAPI
+    note right: Query includes id, name, tags, totalPriceSet, etc.
+
+    alt Query succeeds
+        ShopifyAPI --> Server: Order data (id, tags, totalPriceSet, etc.)
+        deactivate ShopifyAPI
+
+        Server -> Server: Render HTML with order data
+        Server --> Browser: 200 OK (HTML + JSON with order)
+        deactivate Server
+
+        Browser -> Merchant: Display order details UI (name, tags, etc.)
+        deactivate Browser
+    else Query fails
+        ShopifyAPI --> Server: Error (e.g., order not found)
+        deactivate ShopifyAPI
+
+        Server -> Logger: Log "Failed to fetch order" {error, orderId: $id}
+        activate Logger
+        Logger --> Server: Success
+        deactivate Logger
+
+        Server --> Browser: 404 Not Found { error: "Order not found" }
+        deactivate Server
+
+        Browser -> Merchant: Display error message
+        deactivate Browser
+    end
+else Authentication failed
+    Server --> Browser: 401 Unauthorized { error: "Invalid session" }
+    deactivate Server
+
+    Browser -> Merchant: Redirect to login or show error
+    deactivate Browser
+end
+
+note right: Merchant sees order details or error
+
+@enduml
